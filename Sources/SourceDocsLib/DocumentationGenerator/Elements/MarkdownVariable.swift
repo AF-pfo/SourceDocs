@@ -18,7 +18,9 @@ struct MarkdownVariable: SwiftDocDictionaryInitializable, MarkdownConvertible {
     }
 
     init?(dictionary: SwiftDocDictionary, options: MarkdownOptions) {
-        guard dictionary.accessLevel >= options.minimumAccessLevel && dictionary.isKind(.varInstance) else {
+        
+        let variables: [SwiftDeclarationKind] = [.varClass, .varInstance]
+        guard dictionary.accessLevel >= options.minimumAccessLevel && dictionary.isKind(variables) else {
             return nil
         }
         self.dictionary = dictionary
