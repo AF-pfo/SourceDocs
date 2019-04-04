@@ -69,6 +69,7 @@ struct MarkdownObject: SwiftDocDictionaryInitializable, MarkdownConvertible {
         **Contents**
 
         \(tableOfContents.joined(separator: "\n"))
+        
         """
     }
 
@@ -78,9 +79,8 @@ struct MarkdownObject: SwiftDocDictionaryInitializable, MarkdownConvertible {
         let methods = collectionOutput(title: "## Methods", collection: self.methods)
 
         return """
-        **\(elementType.uppercased())**
 
-        # `\(name)`
+        # \(name)
 
         \(toc)
 

@@ -27,13 +27,10 @@ struct MarkdownTypealias: SwiftDocDictionaryInitializable, MarkdownConvertible {
 
     var markdown: String {
         return """
-        **TYPEALIAS**
 
-        # `\(name)`
+        # \(name)
 
         \(declaration)
-
-        \(comment)
         """
     }
 }

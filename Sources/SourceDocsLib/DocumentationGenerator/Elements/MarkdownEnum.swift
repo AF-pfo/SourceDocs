@@ -84,9 +84,8 @@ struct MarkdownEnum: SwiftDocDictionaryInitializable, MarkdownConvertible {
         let methods = collectionOutput(title: "## Methods", collection: self.methods)
 
         return """
-        **ENUM**
 
-        # `\(name)`
+        # \(name)
 
         \(toc)
 

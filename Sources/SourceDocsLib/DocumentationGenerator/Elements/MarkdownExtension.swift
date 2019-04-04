@@ -48,9 +48,8 @@ struct MarkdownExtension: SwiftDocDictionaryInitializable, MarkdownConvertible {
         let properties = collectionOutput(title: "## Properties", collection: self.properties)
         let methods = collectionOutput(title: "## Methods", collection: self.methods)
         return """
-        **EXTENSION**
 
-        # `\(name)`
+        # \(name)
         \(declaration)
 
         \(properties)
