@@ -52,22 +52,24 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
 
     var markdown: String {
         let details = """
-        \(declaration)
-
         \(comment)
+        
+        \(declaration)
 
         \(parametersTable)
         """
 
-        if options.collapsibleBlocks {
-            return MarkdownCollapsibleSection(summary: "<code>\(name)</code>", details: details).markdown
-        } else {
-            return """
-            ### \(name)
-
-            \(details)
-            """
-        }
+        return MarkdownCollapsibleSection(summary: "\(name)", details: details).markdown
+        
+//        if options.collapsibleBlocks {
+//            return MarkdownCollapsibleSection(summary: "<code>\(name)</code>", details: details).markdown
+//        } else {
+//            return """
+//            ### \(name)
+//
+//            \(details)
+//            """
+//        }
     }
 }
 
