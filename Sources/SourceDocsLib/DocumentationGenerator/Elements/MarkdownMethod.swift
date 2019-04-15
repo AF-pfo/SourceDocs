@@ -49,7 +49,7 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
         \(table.markdown)
         """
     }
-
+    
     var markdown: String {
         let details = """
         \(comment)

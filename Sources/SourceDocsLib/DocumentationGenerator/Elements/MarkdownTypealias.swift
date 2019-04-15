@@ -12,22 +12,39 @@ import MarkdownGenerator
 struct MarkdownTypealias: SwiftDocDictionaryInitializable, MarkdownConvertible {
     let dictionary: SwiftDocDictionary
     let options: MarkdownOptions
+    let moduleName: String
 
     init?(dictionary: SwiftDocDictionary) {
         fatalError("Not supported")
     }
 
-    init?(dictionary: SwiftDocDictionary, options: MarkdownOptions) {
+    init?(dictionary: SwiftDocDictionary, options: MarkdownOptions, moduleName: String) {
         guard dictionary.accessLevel >= options.minimumAccessLevel && dictionary.isKind([.typealias]) else {
             return nil
         }
         self.dictionary = dictionary
         self.options = options
+        self.moduleName = moduleName
     }
-
+    
+    var moduleNameMD:String {
+        if self.moduleName != "" {
+            return """
+            ---
+            module: "\(self.moduleName)"
+            ---
+            
+            """
+            
+        } else {
+            return ""
+        }
+    }
+    
     var markdown: String {
         return """
-
+        \(self.moduleNameMD)
+        
         # \(name)
 
         \(declaration)

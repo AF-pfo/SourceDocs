@@ -96,7 +96,23 @@ public final class DocumentationGenerator {
                 try generateDocumentation(docs: docs, module: module, options: options)
             } else {
                 let docs = try parseXcodeProject(args: options.xcodeArguments, path: options.inputFolder)
-                try generateDocumentation(docs: docs, module: "", options: options)
+                var scheme = ""
+                
+                for i in 0 ..< options.xcodeArguments.count {
+                    guard let argument = options.xcodeArguments.item(at: i) else {
+                        continue
+                    }
+                    
+                    if argument == "-scheme" {
+                        guard let nextArgument = options.xcodeArguments.item(at: i + 1) else {
+                            break
+                        }
+                        scheme = nextArgument
+                    }
+                }
+                
+                try generateDocumentation(docs: docs, module: scheme, options: options)
+
             }
             fputs("Done 🎉\n".green, stdout)
         } catch let error as SourceDocsError {
@@ -137,7 +153,7 @@ public final class DocumentationGenerator {
         if options.clean {
             try DocumentationEraser(docsPath: docsPath).run()
         }
-        process(docs: docs)
+        process(docs: docs, moduleName: module)
         try markdownIndex.write(to: docsPath,
                                 linkBeginningText: options.linkBeginningText,
                                 linkEndingText: options.linkEndingText,
@@ -145,32 +161,32 @@ public final class DocumentationGenerator {
         markdownIndex.reset()
     }
 
-    private func process(docs: [SwiftDocs]) {
+    private func process(docs: [SwiftDocs], moduleName: String) {
         let dictionaries = docs.compactMap { $0.docsDictionary.bridge() as? SwiftDocDictionary }
-        process(dictionaries: dictionaries)
+        process(dictionaries: dictionaries, moduleName: moduleName)
     }
 
-    private func process(dictionaries: [SwiftDocDictionary]) {
-        dictionaries.forEach { process(dictionary: $0) }
+    private func process(dictionaries: [SwiftDocDictionary], moduleName: String) {
+        dictionaries.forEach { process(dictionary: $0, moduleName: moduleName) }
     }
 
-    private func process(dictionary: SwiftDocDictionary) {
+    private func process(dictionary: SwiftDocDictionary, moduleName: String) {
         let markdownOptions = MarkdownOptions(collapsibleBlocks: options.collapsibleBlocks,
                                               tableOfContents: options.tableOfContents,
                                               minimumAccessLevel: options.minimumAccessLevel)
 
         if let value: String = dictionary.get(.kind), let kind = SwiftDeclarationKind(rawValue: value) {
-            if kind == .struct, let item = MarkdownObject(dictionary: dictionary, options: markdownOptions) {
+            if kind == .struct, let item = MarkdownObject(dictionary: dictionary, options: markdownOptions, moduleName: moduleName) {
                 markdownIndex.structs.append(item)
-            } else if kind == .class, let item = MarkdownObject(dictionary: dictionary, options: markdownOptions) {
+            } else if kind == .class, let item = MarkdownObject(dictionary: dictionary, options: markdownOptions, moduleName: moduleName) {
                 markdownIndex.classes.append(item)
-            } else if let item = MarkdownExtension(dictionary: dictionary, options: markdownOptions) {
+            } else if let item = MarkdownExtension(dictionary: dictionary, options: markdownOptions, moduleName: moduleName) {
                 markdownIndex.extensions.append(item)
-            } else if let item = MarkdownEnum(dictionary: dictionary, options: markdownOptions) {
+            } else if let item = MarkdownEnum(dictionary: dictionary, options: markdownOptions, moduleName: moduleName) {
                 markdownIndex.enums.append(item)
-            } else if let item = MarkdownProtocol(dictionary: dictionary, options: markdownOptions) {
+            } else if let item = MarkdownProtocol(dictionary: dictionary, options: markdownOptions, moduleName: moduleName) {
                 markdownIndex.protocols.append(item)
-            } else if let item = MarkdownTypealias(dictionary: dictionary, options: markdownOptions) {
+            } else if let item = MarkdownTypealias(dictionary: dictionary, options: markdownOptions, moduleName: moduleName) {
                 markdownIndex.typealiases.append(item)
             } else if kind == .functionFree,
                 let item = MarkdownMethod(dictionary: dictionary, options: markdownOptions) {
@@ -190,7 +206,7 @@ public final class DocumentationGenerator {
                 substructureWithParent = substructure
             }
 
-            process(dictionaries: substructureWithParent)
+            process(dictionaries: substructureWithParent, moduleName: moduleName)
         }
     }
 }
