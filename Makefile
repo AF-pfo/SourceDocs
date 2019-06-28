@@ -33,8 +33,8 @@ zip: build
 	zip -D $(TOOL_NAME).macos.zip $(BUILD_PATH)
 
 get_sha:
-	curl -OLs https://github.com/eneko/$(TOOL_NAME)/archive/$(VERSION).tar.gz
-	shasum -a 256 $(TAR_FILENAME) | cut -f 1 -d " " > sha_$(VERSION).txt
+	curl -OLs https://github.com/forstnerpaul/$(TOOL_NAME)/archive/$(VERSION).tar.gz
+	shasum -a 256 $(TAR_FILENAME)
 	rm $(TAR_FILENAME)
 
 brew_push: get_sha

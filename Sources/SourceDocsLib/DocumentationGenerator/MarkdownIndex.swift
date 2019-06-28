@@ -43,61 +43,29 @@ class MarkdownIndex {
         extensions = flattenedExtensions()
 
         fputs("Generating Markdown documentation...\n".green, stdout)
-        var content: [MarkdownConvertible] = [
-            "# Reference Documentation"
-        ]
 
-        try content.append(writeAndIndexFiles(items: protocols, to: docsPath, collectionTitle: "Protocols",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
-        try content.append(writeAndIndexFiles(items: structs, to: docsPath, collectionTitle: "Structs",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
-        try content.append(writeAndIndexFiles(items: classes, to: docsPath, collectionTitle: "Classes",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
-        try content.append(writeAndIndexFiles(items: enums, to: docsPath, collectionTitle: "Enums",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
-        try content.append(writeAndIndexFiles(items: extensions, to: docsPath, collectionTitle: "Extensions",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
-        try content.append(writeAndIndexFiles(items: typealiases, to: docsPath, collectionTitle: "Typealiases",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
-        try content.append(writeAndIndexFiles(items: methods, to: docsPath, collectionTitle: "Methods",
-                                              linkBeginningText: linkBeginningText,
-                                              linkEndingText: linkEndingText))
+        try write(items: protocols, to: docsPath, collectionTitle: "Protocols")
+        try write(items: structs, to: docsPath, collectionTitle: "Structs")
+        try write(items: classes, to: docsPath, collectionTitle: "Classes")
+        try write(items: enums, to: docsPath, collectionTitle: "Enums")
+        try write(items: extensions, to: docsPath, collectionTitle: "Extensions")
+        try write(items: typealiases, to: docsPath, collectionTitle: "Typealiases")
+        try write(items: methods, to: docsPath, collectionTitle: "Methods")
 
-        let footer = DocumentationGenerator.generateFooter(reproducibleDocs: options.reproducibleDocs)
-        content.append(footer)
-
-        try writeFile(file: MarkdownFile(filename: "README", basePath: docsPath, content: content))
+        fputs("Done 🎉\n".green, stdout)
     }
-
-    func writeAndIndexFiles(items: [MarkdownConvertible & SwiftDocDictionaryInitializable],
-                            to docsPath: String, collectionTitle: String,
-                            linkBeginningText: String,
-                            linkEndingText: String) throws -> [MarkdownConvertible] {
+    
+    private func write(items: [MarkdownConvertible & SwiftDocDictionaryInitializable],
+                                    to docsPath: String, collectionTitle: String) throws {
         if items.isEmpty {
-            return []
+            return
         }
 
         // Make and write files
         let files = makeFiles(with: items, basePath: "\(docsPath)/\(collectionTitle.lowercased())")
         try files.forEach { try writeFile(file: $0) }
-
-        // Make links for index
-        let links: [MarkdownLink] = files.map {
-            let url = "\(linkBeginningText)\(collectionTitle.lowercased())/\($0.filename)\(linkEndingText)"
-            return MarkdownLink(text: $0.filename, url: url)
-        }
-        return [
-            "## \(collectionTitle)",
-            MarkdownList(items: links.sorted { $0.text < $1.text })
-        ]
     }
-
+    
     func writeFile(file: MarkdownFile) throws {
         fputs("  Writing documentation file: \(file.filePath)", stdout)
         do {
