@@ -12,13 +12,12 @@ Gem::Specification.new do |spec|
   spec.summary       = "Creates Markdown files from swift code"
   spec.description   = "Must be running in your Xcode project's root directory"
   spec.homepage      = "https://github.com/forstnerpaul/SourceDocs"
+  spec.license       = 'MIT'
   
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  spec.files         = `git ls-files`.split($/)
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  end
-  spec.bindir        = "exe"
+  spec.files         = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  
   spec.executables   = "sourcedocs"
   spec.require_paths = ["lib"]
 
