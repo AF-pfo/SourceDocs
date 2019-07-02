@@ -28,22 +28,13 @@ struct MarkdownVariable: SwiftDocDictionaryInitializable, MarkdownConvertible {
     }
 
     var markdown: String {
-        let details = """
+        return """
+        
+        ### \(name)
+        
         \(comment)
         
         \(declaration)
         """
-
-        return MarkdownCollapsibleSection(summary: "\(name)", details: details).markdown
-        
-//        if options.collapsibleBlocks {
-//            return MarkdownCollapsibleSection(summary: "<code>\(name)</code>", details: details).markdown
-//        } else {
-//            return """
-//            ### \(name)
-//
-//            \(details)
-//            """
-//        }
     }
 }

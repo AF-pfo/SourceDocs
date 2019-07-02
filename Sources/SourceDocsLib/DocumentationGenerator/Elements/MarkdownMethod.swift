@@ -14,7 +14,7 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
     let options: MarkdownOptions
 
     let parameters: [MarkdownMethodParameter]
-
+    
     init?(dictionary: SwiftDocDictionary) {
         fatalError("Not supported")
     }
@@ -50,26 +50,39 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
         """
     }
     
+    var returnValue: String {
+        
+        guard let discussion: [SwiftDocDictionary] = self.dictionary.get(.docResultDiscussion) else {
+            return ""
+        }
+        let value = discussion.compactMap { $0["Para"] as? String }.first
+
+        guard let unwrappedValue = value else {
+            return ""
+        }
+        
+        return """
+        
+        #### Return Value
+        
+        \(unwrappedValue)
+        """
+    }
+    
     var markdown: String {
-        let details = """
+        
+        return """
+        
+        ### \(name)
+        
         \(comment)
         
         \(declaration)
-
-        \(parametersTable)
-        """
-
-        return MarkdownCollapsibleSection(summary: "\(name)", details: details).markdown
         
-//        if options.collapsibleBlocks {
-//            return MarkdownCollapsibleSection(summary: "<code>\(name)</code>", details: details).markdown
-//        } else {
-//            return """
-//            ### \(name)
-//
-//            \(details)
-//            """
-//        }
+        \(parametersTable)
+        
+        \(returnValue)
+        """
     }
 }
 

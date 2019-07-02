@@ -131,13 +131,13 @@ struct MarkdownEnumCaseElement: SwiftDocDictionaryInitializable, MarkdownConvert
 
     var markdown: String {
         
-        let details = """
+        return """
+
+        ### \(name)
+        
+        \(comment)
         
         \(declaration)
-
-        \(comment)
         """
-        
-        return MarkdownCollapsibleSection(summary: "\(name)", details: details).markdown
     }
 }

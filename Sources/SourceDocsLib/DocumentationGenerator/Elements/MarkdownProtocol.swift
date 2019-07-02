@@ -60,9 +60,9 @@ struct MarkdownProtocol: SwiftDocDictionaryInitializable, MarkdownConvertible {
         
         # \(name)
 
-        \(declaration)
-
         \(comment)
+
+        \(declaration)
 
         \(properties)
 
