@@ -38,25 +38,10 @@ struct MarkdownProtocol: SwiftDocDictionaryInitializable, MarkdownConvertible {
         }
     }
     
-    var moduleNameMD:String {
-        if self.moduleName != "" {
-            return """
-            ---
-            module: "\(self.moduleName)"
-            ---
-            
-            """
-            
-        } else {
-            return ""
-        }
-    }
-    
     var markdown: String {
         let properties = collectionOutput(title: "## Properties", collection: self.properties)
         let methods = collectionOutput(title: "## Methods", collection: self.methods)
         return """
-        \(self.moduleNameMD)
         
         # \(name)
 

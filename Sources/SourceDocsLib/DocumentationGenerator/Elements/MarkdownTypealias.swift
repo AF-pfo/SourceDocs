@@ -27,23 +27,8 @@ struct MarkdownTypealias: SwiftDocDictionaryInitializable, MarkdownConvertible {
         self.moduleName = moduleName
     }
     
-    var moduleNameMD:String {
-        if self.moduleName != "" {
-            return """
-            ---
-            module: "\(self.moduleName)"
-            ---
-            
-            """
-            
-        } else {
-            return ""
-        }
-    }
-    
     var markdown: String {
         return """
-        \(self.moduleNameMD)
         
         # \(name)
 

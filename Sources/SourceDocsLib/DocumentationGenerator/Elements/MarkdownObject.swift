@@ -74,20 +74,6 @@ struct MarkdownObject: SwiftDocDictionaryInitializable, MarkdownConvertible {
         
         """
     }
-    
-    var moduleNameMD:String {
-        if self.moduleName != "" {
-            return """
-            ---
-            module: "\(self.moduleName)"
-            ---
-            
-            """
-            
-        } else {
-            return ""
-        }
-    }
 
     var markdown: String {
         let toc = options.tableOfContents ? tableOfContents : ""
@@ -95,7 +81,6 @@ struct MarkdownObject: SwiftDocDictionaryInitializable, MarkdownConvertible {
         let methods = collectionOutput(title: "## Methods", collection: self.methods)
 
         return """
-        \(self.moduleNameMD)
         
         # \(name)
 
