@@ -78,7 +78,8 @@ class MarkdownIndex {
         }
         let collectionContent: [MarkdownConvertible] = [
             "## \(collectionTitle)",
-            MarkdownList(items: collectionLinks.sorted { $0.text < $1.text })
+            MarkdownList(items: collectionLinks.sorted { $0.text < $1.text }),
+            ""
             ]
         try writeFile(file: MarkdownFile(filename: "index", basePath: basePath, content: collectionContent))
         
@@ -90,7 +91,8 @@ class MarkdownIndex {
         
         return [
             "## \(collectionTitle)",
-            MarkdownList(items: moduleLinks.sorted { $0.text < $1.text })
+            MarkdownList(items: moduleLinks.sorted { $0.text < $1.text }),
+            ""
         ]
     }
     

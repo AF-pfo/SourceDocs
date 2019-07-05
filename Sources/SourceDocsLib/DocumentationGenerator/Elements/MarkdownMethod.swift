@@ -9,11 +9,13 @@ import Foundation
 import SourceKittenFramework
 import MarkdownGenerator
 
-struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
+struct MarkdownMethod:  SwiftDocDictionaryInitializable, MarkdownConvertible {
     let dictionary: SwiftDocDictionary
     let options: MarkdownOptions
 
     let parameters: [MarkdownMethodParameter]
+    var plainComment = ""
+    var throwsValue = ""
     
     init?(dictionary: SwiftDocDictionary) {
         fatalError("Not supported")
@@ -35,6 +37,8 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
         } else {
             parameters = []
         }
+        
+        self.setCommentAndThrowValue()
     }
 
     var parametersTable: String {
@@ -75,14 +79,61 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
         
         ### \(name)
         
-        \(comment)
+        \(plainComment)
         
         \(declaration)
         
         \(parametersTable)
         
         \(returnValue)
+        
+        \(throwsValue)
+        
         """
+    }
+    
+    private mutating func setCommentAndThrowValue() {
+        
+        guard let xmlString = self.dictionary["key.doc.full_as_xml"] as? String else {
+            return
+        }
+        do {
+            let xml = try XMLDocument(xmlString: xmlString, options: XMLNode.Options.nodePrettyPrint)
+            guard let functionNode = self.getNodeWithName("Function", from: xml.children),
+                let commentPartsNode = self.getNodeWithName("CommentParts", from: functionNode.children) else {
+                    return
+            }
+            
+            if let plainCommentNode = self.getNodeWithName("Abstract", from: commentPartsNode.children),
+                let parameterNode = self.getNodeWithName("Para", from: plainCommentNode.children) {
+                self.plainComment = parameterNode.stringValue ?? self.comment
+            }
+            
+            if let throwNode = self.getNodeWithName("ThrowsDiscussion", from: commentPartsNode.children),
+                let parameterNode = self.getNodeWithName("Para", from: throwNode.children) {
+                self.throwsValue = """
+                #### Throws
+                
+                \(parameterNode.stringValue ?? "")
+                
+                """
+            }
+        } catch {
+            print("Couldn't create xml document")
+        }
+    }
+    
+    private func getNodeWithName(_ name: String, from xmlNodes: [XMLNode]?) -> XMLNode? {
+        
+        guard let xmlNodes = xmlNodes else {
+            return nil
+        }
+        for node in xmlNodes {
+            if node.name == name {
+                return node
+            }
+        }
+        return nil
     }
 }
 

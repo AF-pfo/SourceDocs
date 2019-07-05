@@ -69,6 +69,8 @@ extension Nameable {
 /// Describes an entity that can "speak"
 public protocol Speaker {
     /// Print a greeting message
+    ///
+    /// Test with one empty line
     func speak()
 }
 
