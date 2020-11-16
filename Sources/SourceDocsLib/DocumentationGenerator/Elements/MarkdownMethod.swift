@@ -62,10 +62,10 @@ struct MarkdownMethod: SwiftDocDictionaryInitializable, MarkdownConvertible {
         }
         
         return """
-        
         #### Return Value
         
         \(unwrappedValue)
+        
         """
     }
     

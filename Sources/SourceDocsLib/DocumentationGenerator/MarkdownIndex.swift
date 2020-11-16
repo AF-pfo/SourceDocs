@@ -43,27 +43,55 @@ class MarkdownIndex {
         extensions = flattenedExtensions()
 
         fputs("Generating Markdown documentation...\n".green, stdout)
+        
+        var content: [MarkdownConvertible] = []
+        
+        try content.append(writeAndIndexFiles(items: protocols, to: docsPath, collectionTitle: "Protocols"))
+        try content.append(writeAndIndexFiles(items: structs, to: docsPath, collectionTitle: "Structs"))
+        try content.append(writeAndIndexFiles(items: classes, to: docsPath, collectionTitle: "Classes"))
+        try content.append(writeAndIndexFiles(items: enums, to: docsPath, collectionTitle: "Enums"))
+        try content.append(writeAndIndexFiles(items: extensions, to: docsPath, collectionTitle: "Extensions"))
+        try content.append(writeAndIndexFiles(items: typealiases, to: docsPath, collectionTitle: "Typealiases"))
+        try content.append(writeAndIndexFiles(items: methods, to: docsPath, collectionTitle: "Methods"))
 
-        try write(items: protocols, to: docsPath, collectionTitle: "Protocols")
-        try write(items: structs, to: docsPath, collectionTitle: "Structs")
-        try write(items: classes, to: docsPath, collectionTitle: "Classes")
-        try write(items: enums, to: docsPath, collectionTitle: "Enums")
-        try write(items: extensions, to: docsPath, collectionTitle: "Extensions")
-        try write(items: typealiases, to: docsPath, collectionTitle: "Typealiases")
-        try write(items: methods, to: docsPath, collectionTitle: "Methods")
-
+        try writeFile(file: MarkdownFile(filename: "index", basePath: docsPath, content: content))
+        
         fputs("Done 🎉\n".green, stdout)
     }
-    
-    private func write(items: [MarkdownConvertible & SwiftDocDictionaryInitializable],
-                                    to docsPath: String, collectionTitle: String) throws {
+
+    private func writeAndIndexFiles(items: [MarkdownConvertible & SwiftDocDictionaryInitializable],
+                                    to docsPath: String, collectionTitle: String) throws -> [MarkdownConvertible] {
+
         if items.isEmpty {
-            return
+            return []
         }
 
         // Make and write files
-        let files = makeFiles(with: items, basePath: "\(docsPath)/\(collectionTitle.lowercased())")
+        let basePath = "\(docsPath)/\(collectionTitle.lowercased())"
+        let files = makeFiles(with: items, basePath: basePath)
         try files.forEach { try writeFile(file: $0) }
+        
+        // Make links for index of collection
+        let collectionLinks: [MarkdownLink] = files.map {
+            let url = "\($0.filename).md"
+            return MarkdownLink(text: $0.filename, url: url)
+        }
+        let collectionContent: [MarkdownConvertible] = [
+            "## \(collectionTitle)",
+            MarkdownList(items: collectionLinks.sorted { $0.text < $1.text })
+            ]
+        try writeFile(file: MarkdownFile(filename: "index", basePath: basePath, content: collectionContent))
+        
+        // Make links for index of module
+        let moduleLinks: [MarkdownLink] = files.map {
+            let url = "\(collectionTitle.lowercased())/\($0.filename).md"
+            return MarkdownLink(text: $0.filename, url: url)
+        }
+        
+        return [
+            "## \(collectionTitle)",
+            MarkdownList(items: moduleLinks.sorted { $0.text < $1.text })
+        ]
     }
     
     func writeFile(file: MarkdownFile) throws {
