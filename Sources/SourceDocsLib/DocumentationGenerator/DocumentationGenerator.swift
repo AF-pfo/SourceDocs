@@ -114,7 +114,6 @@ public final class DocumentationGenerator {
                 try generateDocumentation(docs: docs, module: scheme, options: options)
 
             }
-            fputs("Done 🎉\n".green, stdout)
         } catch let error as SourceDocsError {
             throw error
         } catch let error {
